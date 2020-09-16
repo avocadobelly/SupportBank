@@ -21,8 +21,8 @@ accounts = {}
 with open('Transactions2014.csv', newline='') as f:
     contents = csv.DictReader(f)
     for row in contents:
-        date = row['Date']
-        # datetime.strptime(row['Date'], %d%m%Y)
+        unformatted_date = row['Date']
+        date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
         sender = row['From']
         recipient = row['To']
         narrative = row['Narrative']
@@ -43,9 +43,7 @@ with open('Transactions2014.csv', newline='') as f:
 
         sender_account.balance = sender_account.balance - amount
         reciever_account.balance = reciever_account.balance + amount
-
         transaction = Transaction(date,sender,recipient,narrative,amount)
-
         sender_account.transaction.append(transaction)
         reciever_account.transaction.append(transaction)
 
