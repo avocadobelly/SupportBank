@@ -2,6 +2,12 @@
 import csv
 from decimal import Decimal
 
+#Create Account:
+#Creates generic SupportBank account
+def create_account(holder):
+    account = {'Holder' : holder, 'Balance' : Decimal(0), 'Transaction' : [] }
+    return account
+
 accounts = {}
 with open('Transactions2014.csv', newline='') as f:
     contents = csv.DictReader(f)
@@ -11,7 +17,7 @@ with open('Transactions2014.csv', newline='') as f:
         if sender in accounts:
             from_account = accounts[sender]
         else:
-            from_account = {'Holder': sender, 'Balance': Decimal(0), 'Transaction' : []}
+            from_account = create_account(sender)
             accounts[sender] = from_account
         if recipient in accounts:
             to_account = accounts[recipient]
@@ -24,4 +30,15 @@ with open('Transactions2014.csv', newline='') as f:
         to_account['Balance'] = to_account['Balance'] + amount
         from_account['Transaction'].append(transaction)
         to_account['Transaction'].append(transaction)
-print(accounts)
+
+#List All
+#prints each Holder and the amount they owe or are owed
+def List_All():
+    for holder,account in accounts.items():
+
+        balance = account['Balance']
+        if balance < 0:
+            print(holder + ' owes: ' + str(abs(balance)))
+        else:
+            print(holder + ' is owed: ' + str(balance))
+List_All()
