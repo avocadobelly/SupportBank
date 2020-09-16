@@ -15,21 +15,24 @@ with open('Transactions2014.csv', newline='') as f:
         sender = row['From']
         recipient = row['To']
         if sender in accounts:
-            from_account = accounts[sender]
+            sender_account = accounts[sender]
         else:
-            from_account = create_account(sender)
-            accounts[sender] = from_account
+            sender_account = create_account(sender)
+            #assigns name to an account
+            accounts[sender] = sender_account
+
         if recipient in accounts:
-            to_account = accounts[recipient]
+            reciever_account = accounts[recipient]
         else:
-            to_account = {'Holder': recipient, 'Balance': Decimal(0), 'Transaction' : []}
-            accounts[recipient] = to_account
-        transaction = row
+            reciever_account = {'Holder': recipient, 'Balance': Decimal(0), 'Transaction' : []}
+            accounts[recipient] = reciever_account
+
         amount = Decimal(row['Amount'])
-        from_account['Balance'] = from_account['Balance'] - amount
-        to_account['Balance'] = to_account['Balance'] + amount
-        from_account['Transaction'].append(transaction)
-        to_account['Transaction'].append(transaction)
+        sender_account['Balance'] = sender_account['Balance'] - amount
+        reciever_account['Balance'] = reciever_account['Balance'] + amount
+        transaction = row
+        sender_account['Transaction'].append(transaction)
+        reciever_account['Transaction'].append(transaction)
 
 #List All
 #prints each Holder and the amount they owe or are owed
@@ -42,3 +45,13 @@ def List_All():
         else:
             print(holder + ' is owed: ' + str(balance))
 List_All()
+
+#List[Account]
+#prints a list of every transaction, with the date and narrative for an account when given the account name
+#pass in holder
+def List(name):
+    account = accounts[name]
+    transaction = account['Transaction']
+    for single_trans in transaction:
+        print(single_trans)
+List(name = 'Jon A')
