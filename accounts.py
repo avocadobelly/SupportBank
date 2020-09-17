@@ -66,7 +66,7 @@ with open(csv_file, newline='') as f:
         unformatted_date = row['Date']
         logging.info('unformatted_date: %s', unformatted_date)
         date = Format_Date(unformatted_date)
-        if date == None:
+        if date is None:
             bad_row = True
 
         sender = row['From']
@@ -81,7 +81,7 @@ with open(csv_file, newline='') as f:
         unformatted_amount = row['Amount']
         logging.info('unformatted_amount: %s', unformatted_amount)
         amount = Convert_to_Decimal(unformatted_amount)
-        if amount == None:
+        if amount is None:
             bad_row = True
 
         sender_account = Register_Accounts(sender)
