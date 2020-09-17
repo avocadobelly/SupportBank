@@ -1,4 +1,6 @@
 #Import libraries
+import logging
+logging.basicConfig(filename='SupportBank.log', filemode='w', level=logging.DEBUG)
 import csv
 from decimal import Decimal
 from datetime import datetime
@@ -19,33 +21,51 @@ class Account:
 
 accounts = {}
 with open('DodgyTransactions2015.csv', newline='') as f:
+    logging.info('CSV file opened!')
     contents = csv.DictReader(f)
+    count = 0
     for row in contents:
+        count = count + 1
+        logging.info('%d',count)
         unformatted_date = row['Date']
         date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
+        logging.info('date formatted')
         sender = row['From']
+        logging.info('sender: %s', sender)
         recipient = row['To']
+        logging.info('recipient: %s', recipient)
         narrative = row['Narrative']
+        logging.info('narrative: %s', narrative)
         amount = Decimal(row['Amount'])
+
+        logging.info('amount: %s', amount)
 
         if sender in accounts:
             sender_account = accounts[sender]
+            logging.info('Sender name: %s recognised as belonging to one of the known accounts.', sender)
         else:
             sender_account = Account(holder = sender)
             #assigns name to an account:
             accounts[sender] = sender_account
+            logging.info('New account created for: %s', sender)
 
         if recipient in accounts:
             reciever_account = accounts[recipient]
+            logging.info('Recipient name: %s recognised as belonging to one of the known accounts.', recipient)
         else:
             reciever_account = Account(holder = recipient)
             accounts[recipient] = reciever_account
+            logging.info('New account created for: %s', recipient)
 
         sender_account.balance = sender_account.balance - amount
+        logging.info('£%s leaves account of %s', (amount, sender_account))
         reciever_account.balance = reciever_account.balance + amount
+        logging.info('£%s is sent to account of %s',(amount, reciever_account))
         transaction = Transaction(date,sender,recipient,narrative,amount)
         sender_account.transaction.append(transaction)
+        logging.info('New transaction of £%s recorded in account of %s', (amount, sender_account))
         reciever_account.transaction.append(transaction)
+        logging.info('New transaction of £%s recorded in account of %s', (amount, reciever_account))
 
 #List All
 #prints each Holder and the amount they owe or are owed
