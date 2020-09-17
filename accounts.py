@@ -26,7 +26,6 @@ def Format_Date(unform_date):
     try:
         date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
     except ValueError as e:
-        bad_row = True
         print('Exception raised: %s. Conversion of %s to date format has failed. '
               'Please check if input supports this format.' % (e, unformatted_date))
         date = None
@@ -34,14 +33,24 @@ def Format_Date(unform_date):
 
 def Convert_to_Decimal(number):
     try:
-        amount = Decimal(unformatted_amount)
+        formatted_number = Decimal(unformatted_amount)
     except BaseException as e:
         bad_row = True
         print('Exception raised: %s. '
               'Type conversion of %s to decimal has failed.'
               ' Please check if input can be cast to a decimal' % (e, row['Amount']))
-        amount = None
-    return amount
+        formatted_number = None
+    return formatted_number
+
+def Register_Accounts(person):
+    if person in accounts:
+        person_account = accounts[person]
+        logging.info('Name %s is recognised as belonging to one of the known accounts.', person)
+    else:
+        accounts[person] = Account(holder=person)
+        person_account = accounts[person]
+        logging.info('New account created for %s', person)
+    return person_account
 
 accounts = {}
 csv_file = 'DodgyTransactions2015.csv'
@@ -57,6 +66,8 @@ with open(csv_file, newline='') as f:
         unformatted_date = row['Date']
         logging.info('unformatted_date: %s', unformatted_date)
         date = Format_Date(unformatted_date)
+        if date == None:
+            bad_row = True
 
         sender = row['From']
         logging.info('sender: %s', sender)
@@ -70,36 +81,26 @@ with open(csv_file, newline='') as f:
         unformatted_amount = row['Amount']
         logging.info('unformatted_amount: %s', unformatted_amount)
         amount = Convert_to_Decimal(unformatted_amount)
+        if amount == None:
+            bad_row = True
 
-        if sender in accounts:
-            sender_account = accounts[sender]
-            logging.info('Sender name of %s recognised as belonging to one of the known accounts.', sender)
-        else:
-            sender_account = Account(holder=sender)
-            accounts[sender] = sender_account
-            logging.info('New account created for %s', sender)
-
-        if recipient in accounts:
-            receiver_account = accounts[recipient]
-            logging.info('Recipient name of %s recognised as belonging to one of the known accounts.', recipient)
-        else:
-            receiver_account = Account(holder=recipient)
-            accounts[recipient] = receiver_account
-            logging.info('New account created for %s', recipient)
+        sender_account = Register_Accounts(sender)
+        recipient_account = Register_Accounts(recipient)
+        print('sender:' + sender_account.holder)
+        print('reciever:%d'% recipient_account.balance)
 
         if bad_row:
             print('Row %s in CSV file contains an incorrect data type'% row_count)
             continue
-
         sender_account.balance = sender_account.balance - amount
         logging.info('£%s leaves account of %s', amount, sender_account.holder)
-        receiver_account.balance = receiver_account.balance + amount
-        logging.info('£%s is sent to account of %s', amount, receiver_account.holder)
+        recipient_account.balance = recipient_account.balance + amount
+        logging.info('£%s is sent to account of %s', amount, recipient_account.holder)
         transaction = Transaction(date,sender,recipient,narrative,amount)
         sender_account.transaction.append(transaction)
         logging.info('New transaction of £%s recorded in account of %s', amount, sender_account.holder)
-        receiver_account.transaction.append(transaction)
-        logging.info('New transaction of £%s recorded in account of %s', amount, receiver_account.holder)
+        recipient_account.transaction.append(transaction)
+        logging.info('New transaction of £%s recorded in account of %s', amount, recipient_account.holder)
 
 #List All
 #prints each Holder and the amount they owe or are owed
