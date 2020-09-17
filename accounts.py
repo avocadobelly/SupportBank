@@ -21,6 +21,16 @@ class Account:
         self.transaction = []
 
 
+def Format_Date(unformatted_date):
+    try:
+        date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
+    except ValueError as e:
+        bad_row = True
+        print('Exception raised: %s. Conversion of %s to date format has failed. '
+              'Please check if input supports this format.' % (e, unformatted_date))
+        date = None
+    return date
+
 accounts = {}
 with open('DodgyTransactions2015.csv', newline='') as f:
     logging.info('CSV file opened!')
@@ -32,13 +42,7 @@ with open('DodgyTransactions2015.csv', newline='') as f:
         unformatted_date = row['Date']
         logging.info('unformatted_date: %s', unformatted_date)
 
-        try:
-            date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
-        except ValueError as e:
-            bad_row = True
-            print('Exception raised: %s. Conversion of %s to date format has failed. '
-                  'Please check if input supports this format.'% (e, unformatted_date))
-            date = None
+        date = Format_Date(unformatted_date)
 
         sender = row['From']
         logging.info('sender: %s', sender)
@@ -109,3 +113,4 @@ def List(name):
     transaction = account.transaction
     for single_trans in transaction:
         print(single_trans.date, single_trans.sender, single_trans.recipient, single_trans.narrative, single_trans.amount)
+
