@@ -70,7 +70,6 @@ with open(csv_file, newline='') as f:
         unformatted_amount = row['Amount']
         logging.info('unformatted_amount: %s', unformatted_amount)
         amount = Convert_to_Decimal(unformatted_amount)
-        print(amount)
 
         if sender in accounts:
             sender_account = accounts[sender]
