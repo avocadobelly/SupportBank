@@ -57,14 +57,12 @@ def List_All():
             print(holder + ' owes: ' + str(abs(balance)))
         else:
             print(holder + ' is owed: ' + str(balance))
-List_All()
 
 #List[Account]
 #prints a list of every transaction, with the date and narrative for an account when given the account name
-#pass in holder
+#To run from command line:  python -c "import accounts; accounts.List(name ='Jon A')"
 def List(name):
     account = accounts[name]
     transaction = account.transaction
     for single_trans in transaction:
         print(single_trans.date, single_trans.sender, single_trans.recipient, single_trans.narrative, single_trans.amount)
-List(name = 'Jon A')
