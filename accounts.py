@@ -5,6 +5,7 @@ import csv
 from decimal import Decimal
 from datetime import datetime
 
+#Classes
 class Transaction:
     def __init__(self,date,sender,recipient,narrative,amount):
         self.date = date
@@ -20,8 +21,8 @@ class Account:
         self.balance = Decimal(0)
         self.transaction = []
 
-
-def Format_Date(unformatted_date):
+#Functions
+def Format_Date(unform_date):
     try:
         date = datetime.strptime(unformatted_date, '%d/%m/%Y').date()
     except ValueError as e:
@@ -31,38 +32,45 @@ def Format_Date(unformatted_date):
         date = None
     return date
 
+def Convert_to_Decimal(number):
+    try:
+        amount = Decimal(unformatted_amount)
+    except BaseException as e:
+        bad_row = True
+        print('Exception raised: %s. '
+              'Type conversion of %s to decimal has failed.'
+              ' Please check if input can be cast to a decimal' % (e, row['Amount']))
+        amount = None
+    return amount
+
 accounts = {}
-with open('DodgyTransactions2015.csv', newline='') as f:
+csv_file = 'DodgyTransactions2015.csv'
+with open(csv_file, newline='') as f:
     logging.info('CSV file opened!')
     contents = csv.DictReader(f)
     row_count = 1
     for row in contents:
+
         bad_row = False
         row_count = row_count + 1
+
         unformatted_date = row['Date']
         logging.info('unformatted_date: %s', unformatted_date)
-
         date = Format_Date(unformatted_date)
 
         sender = row['From']
         logging.info('sender: %s', sender)
+
         recipient = row['To']
         logging.info('recipient: %s', recipient)
+
         narrative = row['Narrative']
         logging.info('narrative: %s', narrative)
+
         unformatted_amount = row['Amount']
         logging.info('unformatted_amount: %s', unformatted_amount)
-
-        try:
-            amount = Decimal(unformatted_amount)
-        except BaseException as e:
-            bad_row = True
-            print('Exception raised: %s. '
-                  'Type conversion of %s to decimal has failed.'
-                  ' Please check if input can be cast to a decimal'% (e, row['Amount']))
-            amount = None
-
-        logging.info('amount: %s', amount)
+        amount = Convert_to_Decimal(unformatted_amount)
+        print(amount)
 
         if sender in accounts:
             sender_account = accounts[sender]
@@ -113,4 +121,3 @@ def List(name):
     transaction = account.transaction
     for single_trans in transaction:
         print(single_trans.date, single_trans.sender, single_trans.recipient, single_trans.narrative, single_trans.amount)
-
