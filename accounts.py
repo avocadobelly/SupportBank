@@ -18,7 +18,7 @@ class Account:
         self.transaction = []
 
 accounts = {}
-with open('Transactions2014.csv', newline='') as f:
+with open('DodgyTransactions2015.csv', newline='') as f:
     contents = csv.DictReader(f)
     for row in contents:
         unformatted_date = row['Date']
